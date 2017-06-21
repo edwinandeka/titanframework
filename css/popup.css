@@ -1,0 +1,11 @@
+div#titan-popup {
+position: absolute;
+    top: 50px;
+    width: 100%;
+    z-index: 10000;
+}
+
+div#titan-popup .alert {
+	margin: 0 auto;
+    max-width: 500px;
+}
