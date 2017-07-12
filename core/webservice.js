@@ -8,7 +8,35 @@
  */
  var WebService = {
 	//servidor hacia el que van dirigidas las peticiones
-	host: '//'+location.host+ '/'+ APP_NAME +'/back/index.php',
+	host: '//'+location.host+ '/'+ APP_NAME +'/server.php',
+
+
+
+	/**
+	 * @name send
+	 * @description Inicializa los eventos inicia reconstructMap que grafíca el mapa
+	 * @param {String} webService , nombre del servicio web a consultar
+	 * @param {object} params , data que se enviará al servidor ej: {id: 'EKA-1', username: 'edwin_eka'}
+	 * @return {$Deferred}  
+	 */
+	 send: function  (route, params) {
+	 	params.route = route;
+	 	return this.post(params);
+	 },
+
+	 /**
+	 * @name sendFiles
+	 * @description para cargar archivos a un servicio en especifico
+	 * @param {String} webService , nombre del servicio web a consultar
+	 * @param {object} params , data que se enviará al servidor ej: {id: 'EKA-1', username: 'edwin_eka'}
+	 * @return {$Deferred}  
+	 */
+	 sendFiles: function  (route, params) {
+	 	params.route = route;
+	 	return this.upload(params);
+	 },
+
+
 	/**
 	 * @name post
 	 * @description Inicializa los eventos inicia reconstructMap que grafíca el mapa
@@ -17,7 +45,8 @@
 	 * @return {$Deferred}  
 	 */
 	 post: function  (params) {
-	 	params.database_name = _database_name;
+	 	params.TENANT = Titan.TENANT || 0;
+	 	params.USER_ID = Titan.USER_ID || 0;
 
 	 	if (Titan.token) {
 
@@ -28,6 +57,13 @@
 				    request.setRequestHeader("token", Titan.token);
 				    request.setRequestHeader("signature", Titan.signature);
 				},
+				success: function(data, textStatus, request){
+
+		 			Titan.token = request.getResponseHeader('token');
+		 			Titan.signature = request.getResponseHeader('signature');
+
+
+			   	},
 		 		dataType: 'json',
 		 		data: params,
 		 		
@@ -42,9 +78,6 @@
 		 	});
 
 	 	} else {
-	 		if (_database_name) {
- 				Titan.view('security', 'lock');
- 			}
 
 	 		return 	$.ajax({
 		 		url: this.host ,
@@ -74,6 +107,91 @@
 
 	 	
 	 },
+
+	 /**
+	 * @name upload
+	 * @description carga archivos al servidor
+	 * @param {object} params , data que se enviará al servidor ej: {id: 'EKA-1', username: 'edwin_eka'}
+	 * @return {$Deferred}  
+	 */
+	 upload: function  ( params) {
+	 	params.TENANT = Titan.TENANT || 0;
+	 	params.USER_ID = Titan.USER_ID || 0;
+
+	 	var formData = new FormData();                  
+
+	    for (var i in params ) {
+	    	var file = params[i];
+	    	formData.append(i, file);
+	    }
+	
+
+	 	if (Titan.token) {
+
+			return 	$.ajax({
+		 		url: this.host ,
+		 		type: 'POST',
+		 		beforeSend: function(request) {
+				    request.setRequestHeader("token", Titan.token);
+				    request.setRequestHeader("signature", Titan.signature);
+				},
+				success: function(data, textStatus, request){
+
+		 			Titan.token = request.getResponseHeader('token');
+		 			Titan.signature = request.getResponseHeader('signature');
+
+
+			   	},
+		 		dataType: 'json',
+		 		data: formData,
+		 		cache: false,
+                contentType: false,
+                processData: false,
+		 		
+		 	}).always(function(data, status, request ){
+		 		if (status == 'parsererror') {
+		 			Titan.message.warning("Por favor contacte al Administrador", ('<pre>' + data.responseText+ '</pre>'));
+		 			
+		 		}else if (data.print_var) {
+		 			Titan.message.warning("print_var",('<pre>' + data.print_var + '</pre>'));
+
+		 		};
+		 	});
+
+	 	} else {
+
+	 		return 	$.ajax({
+		 		url: this.host ,
+		 		type: 'POST',
+		 		success: function(data, textStatus, request){
+
+		 			Titan.token = request.getResponseHeader('token');
+		 			Titan.signature = request.getResponseHeader('signature');
+
+
+			   	},
+
+		 		dataType: 'json',
+		 		data: formData,
+		 		cache: false,
+                contentType: false,
+                processData: false,
+		 		
+		 	}).always(function(data, status, request ){
+
+		 		if (status == 'parsererror') {
+		 			Titan.message.warning("Por favor contacte al Administrador", ('<pre>' + data.responseText+ '</pre>'));
+		 			
+		 		}else if (data.print_var) {
+		 			Titan.message.warning("print_var",('<pre>' + data.print_var + '</pre>'));
+
+		 		};
+		 	});
+	 	}
+
+	 	
+	 },
+
 	 /**
 	 * @name get
 	 * @description 

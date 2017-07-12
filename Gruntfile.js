@@ -1,16 +1,25 @@
 var arrClases = [
+/* Librerias */
+'js/crypto.js', 
+'js/sha1.js', 
+'js/base64.js', 
 'js/sweetalert.js', 
 
+/* Core */
 'core/global.js', 
 'core/module.js', 
 'core/lang.js', 
 'core/event.js', 
 'core/util.js', 
 'core/view.js', 
+'core/render.js', 
 'core/webservice.js', 
 'core/message.js', 
 'core/popup.js', 
 'core/validate.js', 
+
+
+
 ];
 
 var arrClasesCss = [
@@ -51,22 +60,22 @@ module.exports = function(grunt) {
 
             core: {
                 src: arrClases,
-                dest: '../sercodex/js/<%= conf.name %>-<%= conf.version %>.js',
+                dest: '../genesis/js/<%= conf.name %>-<%= conf.version %>.js',
             },
 
             css: {
                 src: arrClasesCss,
-                dest: '../sercodex/css/<%= conf.name %>-<%= conf.version %>.css',
+                dest: '../genesis/css/<%= conf.name %>-<%= conf.version %>.css',
             },
 
 
 
             all: {
                 src: [
-                '../sercodex/js/<%= conf.name %>-<%= conf.version %>.core.js', 
-                '../sercodex/js/<%= conf.name %>-<%= conf.version %>.html.js', 
+                '../genesis/js/<%= conf.name %>-<%= conf.version %>.core.js', 
+                '../genesis/js/<%= conf.name %>-<%= conf.version %>.html.js', 
                 ],
-                dest: '../sercodex/js/<%= conf.name %>-<%= conf.version %>.js',
+                dest: '../genesis/js/<%= conf.name %>-<%= conf.version %>.js',
             },
         },
         
