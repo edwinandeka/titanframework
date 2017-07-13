@@ -147,16 +147,17 @@ Titan.Dialog = {
 			valida si se ha creado antes el contenedor de mensajes, de no ser asi lo crea
 		 */
 		var container = $('div#titan-message');
-		if (container.length > 0) {
-			container.html(html);
-			$('#titan-message-modal-id').modal('show');
-		} else{
+
+		if (container.length <= 0) {
 			var container = $('<div id="titan-message"></div>');
 			$('body').append(container);
-			var container = $('div#titan-message');
-			container.html(html);
-			$('#titan-message-modal-id').modal('show');
+			container = $('div#titan-message');
 		}
+
+		container.html(html);
+		var bodyContainer = container.find('.modal-body');
+		bodyContainer.html(body);
+		$('#titan-message-modal-id').modal('show');
 
 		//enciende el evento en caso de existir
 		if (callback) {
