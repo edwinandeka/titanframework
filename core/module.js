@@ -33,7 +33,7 @@ Titan.modules.create = function (obj) {
 Titan.init = function () {
 	
 	WebService.post({app: 'login'}).done(function(data) {
-		Titan.render($('body'), data)
+		Titan.render($('body'), data);
 	});
  	
 };
@@ -41,7 +41,7 @@ Titan.init = function () {
 Titan.mainframe = function () {
 	
 	WebService.post({app: 'mainframe'}).done(function(data) {
-		Titan.render($('body'), data)
+		Titan.render($('body'), data);
 	});
  	
 };
@@ -49,7 +49,16 @@ Titan.mainframe = function () {
 Titan.loadApp = function (id, container) {
 	
 	WebService.post({app: id }).done(function(data) {
-		Titan.render(container, data)
+		Titan.render(container, data);
+	});
+ 	
+};
+
+Titan.loadPartial = function (name, container, path, params) {
+	
+	WebService.post({partialname: name, PATH: path }).done(function(data) {
+		data.params = params;
+		Titan.render(container, data, );
 	});
  	
 };

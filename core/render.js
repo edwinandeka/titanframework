@@ -23,8 +23,22 @@
  	var nameView = data.nameView;
  	var category = data.category;
  	var params = data.params || {};
+	var partial;
 
- 	var idContainerHtml = category + '-' + nameView +'-app-container';
+
+ 	if (category.contains('/')) {
+		partial = nameView;
+		category = category.split('/');
+		nameView = category.pop();
+		category = category.pop();
+	}
+
+	var idContainerHtml;
+	if (partial) {
+ 		idContainerHtml = category + '-' + nameView + '-' + partial + '-app-container';
+	} else {
+ 		idContainerHtml = category + '-' + nameView + '-app-container';
+	}
 
 
  	var container;
@@ -60,6 +74,24 @@
  				data = data.replace(exp , params[key] );
  			}
  		}
+
+
+ 		/**
+ 		 * 
+ 		 * ejecutar codigo javascript desde el html
+ 		var expCode = /{&(.(?!\&)||\s)+.&}/gmi;
+
+
+ 		var codes = data.match(expCode);
+ 				debugger
+
+ 		for(var key in codes) {
+ 			if(key != 'contains'){
+
+ 				data = data.replace(exp , eval(codes[key].substring(2, codes[key].length -2 )) );
+ 			}
+ 		}**/
+
 
 		content.append(data);
 		content.css('height', '100%').css('width', '100%');
@@ -105,6 +137,7 @@
 	 */
 	 function  loadjs(controller, params) {
 
+
 	 	eval(controller);
 		function getFuntion(selector) {
 			
@@ -126,32 +159,47 @@
 			data.PATH = this.params.PATH;
 			WebService.sendFiles(service, data ).done(this[callback].bind(this));
 		}
+
+		function partialFun(name, container, params) { 
+			Titan.loadPartial(name, container, this.params.PATH, params);
+		}
+
+		
 		
 		if(!Titan.app[category]){
 			Titan.app[category] = {};
 		}
 
-		var obj = Titan.modules[nameView.capitalize()];
-		// var obj = JSON.parse(controller);
-		// var obj = {};
+		var obj;
+		if (partial) {
+			obj = Titan.modules[partial.capitalize()];
+		} else {
+			obj = Titan.modules[nameView.capitalize()];
+		}
 		obj.mainContainer = container;
 		obj.getContainer = getContainer;
 		obj.get = getFuntion;
 		obj.service = service;
+		obj.loadPartial = partialFun;
+		obj.partials = {};
 		obj.serviceUpload = serviceUpload;
 
 		obj.params = params;
-		obj.params.PATH = category +'/'+nameView;
 		
-		if (nameView == 'crud') {
-			Titan.app[category][nameView+'-'+this.params.id] = obj;
-		}else{
+		/* se registra la app o el partial */
+		if (partial) {
+			obj.params.PATH = category +'/'+nameView +'/partials/'+ partial;
+			Titan.app[category][nameView].partials[partial] = obj;
+			Titan.app[category][nameView].partials[partial].appParent = Titan.app[category][nameView];
+		} else {
+			obj.params.PATH = category +'/'+nameView;
 			Titan.app[category][nameView] = obj;
 		}
 
+		/* se renderiza el html */
  		loadhtml(view, obj.params );	
-		// obj.mainContainer.css('height', '100%').css('width', '100%');
 
+		/* se inicializan los eventos */
 		if ( 'ready' in obj) {
 			obj.ready();
 			if ( 'initEvents' in obj){
