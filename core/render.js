@@ -97,6 +97,20 @@
 		content.css('height', '100%').css('width', '100%');
 		container.html(content);
 		container = content;
+
+		/* buscamos y cargamos partials desde el html 
+		var REGEX_PARTIALS = /<partial(.(?!\/))+.\s?\/>/gmi;
+ 		var partials = data.match(REGEX_PARTIALS);
+ 		var partial;
+ 		
+ 		for(var key in partials) {
+ 			if(key != 'contains'){
+ 				partial = partials[key];
+
+ 				data = data.replace(exp , eval(partials[key].substring(2, partials[key].length -2 )) );
+ 			}
+ 		}*/
+		
  		
 	 }
 
@@ -107,6 +121,11 @@
 	 * @return {void} 
 	 */
 	  function  loadcss(cssContent, params) {
+
+	  	/* remover los comentarios */
+	  	var REGEX_COMMENTS = /\/\*((.|\s)(?!\*\/))+\s+?\*\//gmi;
+ 		cssContent = cssContent.replace(REGEX_COMMENTS , '' );
+	
 
 		var reg =  /[\.#\w\*][\.#\w\s-~:\n,->\*\+\]\["\/=\^\$\(\)]*\{[\n\s\w-:#;%\d\(,\.\)"\*\/]*}/gmi;
 		
@@ -123,11 +142,18 @@
  				cssContent = cssContent.replace(exp , params[key] );
  			}
  		}
-			
+
+
+ 				
 		var s = document.createElement('style');
 		s.setAttribute('type', 'text/css');
 		s.innerHTML = cssContent;
-		document.getElementsByTagName("head")[0].appendChild(s);
+		s = $(s);
+		s.attr({
+			type: 'text/css',
+			'data-view': category +'-'+nameView
+		});
+		$("head").append(s);
 	 }
 
 	/**
